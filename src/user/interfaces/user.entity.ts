@@ -17,7 +17,7 @@ export class UserEntity {
     @Column({name:'cpf', nullable:false})
     cpf: string;
 
-    @Column({name:'phone'})
+    @Column({name:'phone', nullable: true})
     phone: string;
 
     @Column({name:'type_user'})
