@@ -1,17 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserEntity } from './interfaces/user.entity';
 import { CreateUserDto } from './dtos/createUsers.dto';
 import { hash } from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class UserService {
 
     constructor(
         @InjectRepository(UserEntity)
-        private readonly userRepository : Repository<UserEntity>
-    ){}
+        private readonly userRepository: Repository<UserEntity>
+    ) { }
 
     async createUser(createUser: CreateUserDto): Promise<UserEntity> {
 
@@ -26,7 +27,20 @@ export class UserService {
         })
     }
 
-    async getAllUsers(): Promise<UserEntity[]>{
+    async getAllUsers(): Promise<UserEntity[]> {
         return this.userRepository.find();
+    }
+
+    async findUserById(userId: number): Promise<UserEntity> {
+        const user = await this.userRepository.findOne({
+            where: {
+                id: userId
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException(`UserID ${userId} not found`)
+        }
+        return user;
     }
 }
